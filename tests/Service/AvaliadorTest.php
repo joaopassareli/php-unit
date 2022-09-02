@@ -11,19 +11,25 @@ use Alura\Leilao\Service\Avaliador;
 
 class AvaliadorTest extends TestCase
 {
+    private $leiloeiro;
+    
+    protected function setUp(): void
+    {
+        $this->leiloeiro = new Avaliador();
+    }
+
     /**
      * @dataProvider leilaoEmOrdemDecrescente
      * @dataProvider leilaoEmOrdemCrescente
      * @dataProvider leilaoEmOrdemAleatoria
      */
     public function testeAvaliadorDeveEncontrarMaiorValorDeLances (Leilao $leilao)
-    {         
-        $leiloeiro = new Avaliador();
+    {
+        // Act - When
+        $this->leiloeiro->avalia($leilao);
+        $maiorValor = $this->leiloeiro->getMaiorValor();
 
-        $leiloeiro->avalia($leilao);
-        $maiorValor = $leiloeiro->getMaiorValor();
-
-        // Assert
+        // Assert - Then
         self::assertEquals(3000, $maiorValor);
     }
 
@@ -34,11 +40,9 @@ class AvaliadorTest extends TestCase
      */
     public function testeAvaliadorDeveEncontrarMenorValorDeLances (Leilao $leilao)
     {
-        $leiloeiro = new Avaliador();
-
         // Act - When
-        $leiloeiro->avalia($leilao);
-        $menorValor = $leiloeiro->getMenorValor();
+        $this->leiloeiro->avalia($leilao);
+        $menorValor = $this->leiloeiro->getMenorValor();
 
         // Assert - Then
         self::assertEquals(2000, $menorValor);
@@ -51,11 +55,9 @@ class AvaliadorTest extends TestCase
      */
     public function testAvaliadorDeveBuscarTresMaioresValores (Leilao $leilao)
     {
-        $leiloeiro = new Avaliador();
-
         // Act
-        $leiloeiro->avalia($leilao);
-        $maioresLances = $leiloeiro->getMaioresLances();
+        $this->leiloeiro->avalia($leilao);
+        $maioresLances = $this->leiloeiro->getMaioresLances();
 
         // Assert
         static::assertCount(3, $maioresLances);
@@ -64,6 +66,8 @@ class AvaliadorTest extends TestCase
         static::assertEquals(2000, $maioresLances[2]->getValor());
     }
 
+
+    /* -------- DADOS -------- */
     public function leilaoEmOrdemCrescente()
     {
         $leilao = new Leilao('Ford Ka 2020 0KM');
@@ -76,7 +80,8 @@ class AvaliadorTest extends TestCase
         $leilao->recebeLance(new Lance($marisa, 2500));
         $leilao->recebeLance(new Lance($bruna, 3000));
 
-        return [[$leilao]];
+        return [
+            'ordem-crescente' => [$leilao]];
     }
 
     public function leilaoEmOrdemDecrescente()
@@ -91,7 +96,9 @@ class AvaliadorTest extends TestCase
         $leilao->recebeLance(new Lance($marisa, 2500));
         $leilao->recebeLance(new Lance($bruna, 2000));
 
-        return [[$leilao]];
+        return [
+            'ordem-decrescente' => [$leilao]
+        ];
     }
 
     public function leilaoEmOrdemAleatoria()
@@ -107,6 +114,8 @@ class AvaliadorTest extends TestCase
         $leilao->recebeLance(new Lance($bruna, 2000));
         $leilao->recebeLance(new Lance($joao, 3000));
 
-        return [[$leilao]];
+        return [
+            'ordem-aleatoria' => [$leilao]
+        ];
     }
 }
