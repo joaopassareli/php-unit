@@ -37,4 +37,40 @@ class LeilaoTest extends TestCase
             '1 - lance' => [1, $leilaoCom1Lance, [5000]]
         ];
     }
+
+    public function testLeilaoNaoDeveReceberLancesRepetidos ()
+    {
+        $leilao = new Leilao('Variante');
+        $joao = new Usuario('João');
+
+        $leilao->recebeLance(new Lance($joao, 2000));
+        $leilao->recebeLance(new Lance($joao, 2500));
+
+        static::assertCount(1, $leilao->getLances());
+        static::assertEquals(2000, $leilao->getLances()[0]->getValor());
+    }
+
+    public function testLeilaoNaoDeveAceitarMaisDe5LancesPorUsuario ()
+    {
+        $leilao = new Leilao('Brasília Amarela');
+
+        $joao = new Usuario('João');
+        $bruna = new Usuario('Bruna');
+
+        $leilao->recebeLance(new Lance($joao, 2000));
+        $leilao->recebeLance(new Lance($bruna, 2500));
+        $leilao->recebeLance(new Lance($joao, 3000));
+        $leilao->recebeLance(new Lance($bruna, 4500));
+        $leilao->recebeLance(new Lance($joao, 5000));
+        $leilao->recebeLance(new Lance($bruna, 5500));
+        $leilao->recebeLance(new Lance($joao, 6000));
+        $leilao->recebeLance(new Lance($bruna, 6500));
+        $leilao->recebeLance(new Lance($joao, 7000));
+        $leilao->recebeLance(new Lance($bruna, 7500));
+
+        $leilao->recebeLance(new Lance($joao, 8000));
+
+        static::assertCount(10, $leilao->getLances());
+        static::assertEquals(7500, $leilao->getLances()[array_key_last($leilao->getLances())]->getValor());
+    }
 }

@@ -11,6 +11,9 @@ use Alura\Leilao\Service\Avaliador;
 
 class AvaliadorTest extends TestCase
 {
+    /**
+     * @var Avaliador
+     */
     private $leiloeiro;
     
     protected function setUp(): void
@@ -64,6 +67,15 @@ class AvaliadorTest extends TestCase
         static::assertEquals(3000, $maioresLances[0]->getValor());
         static::assertEquals(2500, $maioresLances[1]->getValor());
         static::assertEquals(2000, $maioresLances[2]->getValor());
+    }
+
+    public function testLeilaoVazioNaoPodeSerAvaliado ()
+    {
+        $this->expectException(\DomainException::class);
+        $this->expectExceptionMessage('Não é possível avaliar um leilão que não possui lances.');
+        
+        $leilao = new Leilao('Gol G4');
+        $this->leiloeiro->avalia($leilao);
     }
 
 
